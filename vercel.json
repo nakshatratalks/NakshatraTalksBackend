@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "framework": null,
+  "installCommand": "cd server && npm install",
+  "buildCommand": "cd server && npm run build",
+  "outputDirectory": "server/dist",
+  "functions": {
+    "server/dist/server.js": {
+      "runtime": "nodejs20.x",
+      "memory": 512,
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "server/dist/server.js"
+    }
+  ]
+}
+
