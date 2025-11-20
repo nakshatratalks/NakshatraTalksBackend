@@ -86,16 +86,18 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log('🚀 Server is running');
-  console.log(`📍 Local: http://localhost:${PORT}`);
-  console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
-  console.log(`🔐 Authentication endpoints:`);
-  console.log(`   - POST ${PORT}/auth/send-otp`);
-  console.log(`   - POST ${PORT}/auth/verify-otp`);
-  console.log(`   - GET ${PORT}/auth/me (protected)`);
-});
+// Start server only when not running in a serverless environment (e.g., Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log('🚀 Server is running');
+    console.log(`📍 Local: http://localhost:${PORT}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+    console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
+    console.log(`🔐 Authentication endpoints:`);
+    console.log(`   - POST ${PORT}/auth/send-otp`);
+    console.log(`   - POST ${PORT}/auth/verify-otp`);
+    console.log(`   - GET ${PORT}/auth/me (protected)`);
+  });
+}
 
 export default app;
