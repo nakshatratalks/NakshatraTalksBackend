@@ -4,20 +4,12 @@
   "description": "NakshatraTalks - A modern full-stack application",
   "private": true,
   "workspaces": [
-    "client",
     "server"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:client": "cd client && npm run dev",
-    "dev:server": "cd server && npm run dev",
-    "build": "npm run build:server && npm run build:client",
-    "build:client": "cd client && npm run build",
-    "build:server": "cd server && npm run build",
-    "start": "concurrently \"npm run start:server\" \"npm run start:client\"",
-    "start:client": "cd client && npm run start",
-    "start:server": "cd server && npm run start",
-    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+    "dev": "npm run dev -w server",
+    "build": "npm run build -w server",
+    "start": "npm run start -w server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
