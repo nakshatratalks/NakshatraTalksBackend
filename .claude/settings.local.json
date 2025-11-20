@@ -11,9 +11,27 @@
       "Bash(webhook-server.b64)",
       "Bash(scp:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(python3:*)",
+      "Bash(git push:*)",
+      "Bash(find:*)",
+      "Bash(timeout 10 npm start:*)",
+      "mcp__supabase__list_projects",
+      "mcp__supabase__apply_migration",
+      "mcp__supabase__get_project_url",
+      "mcp__supabase__get_anon_key",
+      "mcp__supabase__generate_typescript_types",
+      "mcp__supabase__execute_sql",
+      "Bash(python -m json.tool:*)",
+      "mcp__supabase__get_advisors",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__list_migrations"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

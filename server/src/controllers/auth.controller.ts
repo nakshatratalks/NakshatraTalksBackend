@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { supabase } from '../config/supabase';
+import { supabase, supabaseAdmin } from '../config/supabase';
 import {
   SendOtpRequest,
   VerifyOtpRequest,
@@ -127,13 +127,51 @@ export const verifyOtp = async (
       return;
     }
 
+    // Check if user exists in public.users table, if not create them
+    const { data: existingUser, error: userCheckError } = await supabaseAdmin
+      .from('users')
+      .select('id, role')
+      .eq('id', data.user.id)
+      .single();
+
+    let userRole = 'user';
+
+    if (userCheckError && userCheckError.code === 'PGRST116') {
+      // User doesn't exist in public.users, create new profile
+      const { data: newUser, error: createError } = await supabaseAdmin
+        .from('users')
+        .insert({
+          id: data.user.id,
+          phone: phone,
+          role: 'user', // Default role
+          wallet_balance: 0,
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select('role')
+        .single();
+
+      if (createError) {
+        console.error('Error creating user profile:', createError);
+        // Continue anyway, user can update profile later
+      } else {
+        userRole = newUser?.role || 'user';
+      }
+    } else if (existingUser) {
+      userRole = existingUser.role;
+    }
+
     // Return access token and user data
     res.status(200).json({
       success: true,
       message: 'OTP verified successfully',
       access_token: data.session.access_token,
       refresh_token: data.session.refresh_token,
-      user: data.user,
+      user: {
+        ...data.user,
+        role: userRole as 'user' | 'astrologer' | 'admin',
+      },
     });
   } catch (error) {
     console.error('Unexpected error in verifyOtp:', error);

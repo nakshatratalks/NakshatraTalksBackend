@@ -22,7 +22,7 @@ build/
 # Testing outputs
 coverage/
 .nyc_output/
-
+.claude/
 # Environment files
 .env
 .env.local

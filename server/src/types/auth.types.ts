@@ -23,6 +23,19 @@ export interface AuthenticatedUser extends User {
   id: string;
   phone?: string;
   email?: string;
+  role?: 'user' | 'astrologer' | 'admin';
+}
+
+/**
+ * Admin user data (from admins table)
+ */
+export interface AdminUser {
+  id: string;
+  username: string;
+  email: string;
+  fullName?: string;
+  role: string;
+  linkedUserId?: string;
 }
 
 /**
@@ -30,6 +43,7 @@ export interface AuthenticatedUser extends User {
  */
 export interface AuthenticatedRequest extends Request {
   user?: AuthenticatedUser;
+  admin?: AdminUser;
 }
 
 /**
