@@ -64,7 +64,11 @@ const options: swaggerJsdoc.Options = {
     },
     security: [],
   },
-  apis: ['./src/routes/*.ts', './src/server.ts'],
+  // In development, scan TypeScript source files
+  // In production (compiled), scan JavaScript files in dist
+  apis: process.env.NODE_ENV === 'production'
+    ? ['./routes/*.js', './server.js']
+    : ['./src/routes/*.ts', './src/server.ts'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
