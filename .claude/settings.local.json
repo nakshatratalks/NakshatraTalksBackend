@@ -4,7 +4,14 @@
       "Bash(mkdir:*)",
       "Bash(npx create-next-app:*)",
       "Bash(npm install)",
-      "Bash(npm run type-check:*)"
+      "Bash(npm run type-check:*)",
+      "Bash(ssh root@147.79.66.3:*)",
+      "Bash(curl:*)",
+      "Bash(npm run build:*)",
+      "Bash(webhook-server.b64)",
+      "Bash(scp:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
