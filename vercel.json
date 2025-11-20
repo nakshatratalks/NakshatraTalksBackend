@@ -3,6 +3,15 @@
   "framework": null,
   "installCommand": "npm install",
   "buildCommand": "npm run build",
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": "server/dist/**"
+      }
+    }
+  ],
   "functions": {
     "api/index.js": {
       "runtime": "nodejs20.x",
@@ -10,10 +19,10 @@
       "maxDuration": 10
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
+      "source": "/(.*)",
+      "destination": "/api/index.js"
     }
   ]
 }
