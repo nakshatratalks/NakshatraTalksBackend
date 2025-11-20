@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+logs
+*.log
+coverage/
+.nyc_output/
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
