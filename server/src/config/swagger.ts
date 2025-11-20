@@ -67,7 +67,7 @@ const options: swaggerJsdoc.Options = {
   // In development, scan TypeScript source files
   // In production (compiled), scan JavaScript files in dist
   apis: process.env.NODE_ENV === 'production'
-    ? ['./routes/*.js', './server.js']
+    ? ['./server/dist/routes/*.js', './server/dist/server.js']
     : ['./src/routes/*.ts', './src/server.ts'],
 };
 
