@@ -10,26 +10,16 @@ const isRunningFromServerDir = fs.existsSync(path.join(cwd, 'src', 'server.ts'))
 
 // Determine the correct path prefix based on where we're running from
 const getApiPaths = (): string[] => {
-  const isProduction = process.env.NODE_ENV === 'production';
+  // IMPORTANT: Always scan TypeScript source files for JSDoc comments
+  // This is because TypeScript compilation can strip JSDoc comments from .js files
+  // Since source files are available in both dev and prod, we always use .ts files
 
-  if (isProduction) {
-    // Production mode - using compiled JavaScript
-    if (isRunningFromServerDir) {
-      // Running from server/ directory (e.g., npm start from server/)
-      return ['./dist/routes/*.js', './dist/controllers/*.js', './dist/server.js', './dist/config/swagger-definitions.js'];
-    } else {
-      // Running from root directory (e.g., PM2 from root)
-      return ['./server/dist/routes/*.js', './server/dist/controllers/*.js', './server/dist/server.js', './server/dist/config/swagger-definitions.js'];
-    }
+  if (isRunningFromServerDir) {
+    // Running from server/ directory (e.g., npm run dev or npm start from server/)
+    return ['./src/routes/*.ts', './src/controllers/*.ts', './src/server.ts', './src/config/swagger-definitions.ts'];
   } else {
-    // Development mode - using TypeScript source files
-    if (isRunningFromServerDir) {
-      // Running from server/ directory (e.g., npm run dev from server/)
-      return ['./src/routes/*.ts', './src/controllers/*.ts', './src/server.ts', './src/config/swagger-definitions.ts'];
-    } else {
-      // Running from root directory
-      return ['./server/src/routes/*.ts', './server/src/controllers/*.ts', './server/src/server.ts', './server/src/config/swagger-definitions.ts'];
-    }
+    // Running from root directory (e.g., PM2 from root)
+    return ['./server/src/routes/*.ts', './server/src/controllers/*.ts', './server/src/server.ts', './server/src/config/swagger-definitions.ts'];
   }
 };
 
