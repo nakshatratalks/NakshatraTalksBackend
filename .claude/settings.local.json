@@ -25,7 +25,8 @@
       "Bash(python -m json.tool:*)",
       "mcp__supabase__get_advisors",
       "mcp__supabase__list_tables",
-      "mcp__supabase__list_migrations"
+      "mcp__supabase__list_migrations",
+      "Bash(gh webhook list:*)"
     ],
     "deny": [],
     "ask": []
