@@ -1,6 +1,37 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { Express } from 'express';
+import path from 'path';
+import fs from 'fs';
+
+// Detect if we're running from the server directory or the root directory
+const cwd = process.cwd();
+const isRunningFromServerDir = fs.existsSync(path.join(cwd, 'src', 'server.ts'));
+
+// Determine the correct path prefix based on where we're running from
+const getApiPaths = (): string[] => {
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  if (isProduction) {
+    // Production mode - using compiled JavaScript
+    if (isRunningFromServerDir) {
+      // Running from server/ directory (e.g., npm start from server/)
+      return ['./dist/routes/*.js', './dist/controllers/*.js', './dist/server.js', './dist/config/swagger-definitions.js'];
+    } else {
+      // Running from root directory (e.g., PM2 from root)
+      return ['./server/dist/routes/*.js', './server/dist/controllers/*.js', './server/dist/server.js', './server/dist/config/swagger-definitions.js'];
+    }
+  } else {
+    // Development mode - using TypeScript source files
+    if (isRunningFromServerDir) {
+      // Running from server/ directory (e.g., npm run dev from server/)
+      return ['./src/routes/*.ts', './src/controllers/*.ts', './src/server.ts', './src/config/swagger-definitions.ts'];
+    } else {
+      // Running from root directory
+      return ['./server/src/routes/*.ts', './server/src/controllers/*.ts', './server/src/server.ts', './server/src/config/swagger-definitions.ts'];
+    }
+  }
+};
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -64,11 +95,8 @@ const options: swaggerJsdoc.Options = {
     },
     security: [],
   },
-  // In development, scan TypeScript source files
-  // In production (compiled), scan JavaScript files in dist
-  apis: process.env.NODE_ENV === 'production'
-    ? ['./server/dist/routes/*.js', './server/dist/controllers/*.js', './server/dist/server.js', './server/dist/config/swagger-definitions.js']
-    : ['./server/src/routes/*.ts', './server/src/controllers/*.ts', './server/src/server.ts', './server/src/config/swagger-definitions.ts'],
+  // Dynamically determine paths based on environment and working directory
+  apis: getApiPaths(),
 };
 
 const swaggerSpec = swaggerJsdoc(options);
