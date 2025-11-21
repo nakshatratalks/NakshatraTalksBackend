@@ -157,8 +157,13 @@ const endExistingSession = async (sessionId: string, userId: string): Promise<vo
 
     const endTime = new Date();
     const startTime = new Date(session.start_time);
-    const durationMinutes = Math.ceil((endTime.getTime() - startTime.getTime()) / (1000 * 60));
-    const totalCost = durationMinutes * session.price_per_minute;
+
+    // Calculate exact duration in seconds
+    const durationSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
+    const durationMinutes = durationSeconds / 60;
+
+    // Calculate exact per-second cost (no rounding up)
+    const totalCost = parseFloat((durationMinutes * session.price_per_minute).toFixed(2));
 
     // Deduct from wallet
     await deductFromWallet(
@@ -229,8 +234,13 @@ export const endChatSession = async (
 
     const endTime = new Date();
     const startTime = new Date(session.start_time);
-    const durationMinutes = Math.ceil((endTime.getTime() - startTime.getTime()) / (1000 * 60));
-    const totalCost = durationMinutes * session.price_per_minute;
+
+    // Calculate exact duration in seconds
+    const durationSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
+    const durationMinutes = durationSeconds / 60;
+
+    // Calculate exact per-second cost (no rounding up)
+    const totalCost = parseFloat((durationMinutes * session.price_per_minute).toFixed(2));
 
     // Deduct from wallet
     const deductResult = await deductFromWallet(
@@ -275,6 +285,11 @@ export const endChatSession = async (
     // Update astrologer total calls
     await supabaseAdmin.rpc('increment_astrologer_calls', { astrologer_id: session.astrologer_id });
 
+    // Format duration message
+    const durationText = durationSeconds < 60
+      ? `${Math.round(durationSeconds)} seconds`
+      : `${durationMinutes.toFixed(1)} minutes`;
+
     sendSuccess(
       res,
       {
@@ -282,12 +297,13 @@ export const endChatSession = async (
         startTime: updatedSession.start_time,
         endTime: updatedSession.end_time,
         duration: updatedSession.duration,
+        durationSeconds: Math.round(durationSeconds),
         pricePerMinute: updatedSession.price_per_minute,
         totalCost: updatedSession.total_cost,
         remainingBalance: deductResult.remainingBalance,
         transactionId: deductResult.transactionId,
       },
-      `Session ended successfully. Total cost: ₹${updatedSession.total_cost} for ${updatedSession.duration} minutes`
+      `Session ended successfully. Total cost: ₹${updatedSession.total_cost} for ${durationText}`
     );
   } catch (error) {
     console.error('Error in endChatSession:', error);
