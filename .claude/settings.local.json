@@ -26,7 +26,17 @@
       "mcp__supabase__get_advisors",
       "mcp__supabase__list_tables",
       "mcp__supabase__list_migrations",
-      "Bash(gh webhook list:*)"
+      "Bash(gh webhook list:*)",
+      "Bash(xargs -I {} bash -c 'echo \"\"\"\"=== {} ===\"\"\"\" && grep -E \"\"\"\"router\\.(get|post|put|delete|patch)\"\"\"\" {} | wc -l')",
+      "Bash(npm install:*)",
+      "Bash(echo:*)",
+      "Bash(npm start)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(git restore:*)",
+      "Bash(nslookup:*)",
+      "Bash(dig:*)"
     ],
     "deny": [],
     "ask": []

@@ -50,7 +50,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'http://147.79.66.3:4000',
+        url: 'https://api.nakshatratalks.com',
         description: 'Production server',
       },
       {
