@@ -9,6 +9,7 @@ import adminAuthRoutes from './routes/admin-auth.routes';
 import usersRoutes from './routes/users.routes';
 import astrologersRoutes, { adminRouter as adminAstrologersRoutes } from './routes/astrologers.routes';
 import categoriesRoutes from './routes/categories.routes';
+import specializationsRoutes from './routes/specializations.routes';
 import searchRoutes from './routes/search.routes';
 import feedbackRoutes from './routes/feedback.routes';
 import walletRoutes from './routes/wallet.routes';
@@ -40,6 +41,7 @@ app.use('/auth/admin', adminAuthRoutes); // Admin authentication routes
 app.use(`${API_VERSION}/users`, usersRoutes);
 app.use(`${API_VERSION}/astrologers`, astrologersRoutes);
 app.use(`${API_VERSION}/categories`, categoriesRoutes);
+app.use(`${API_VERSION}/specializations`, specializationsRoutes);
 app.use(`${API_VERSION}/search`, searchRoutes);
 app.use(`${API_VERSION}/feedback`, feedbackRoutes);
 app.use(`${API_VERSION}/wallet`, walletRoutes);

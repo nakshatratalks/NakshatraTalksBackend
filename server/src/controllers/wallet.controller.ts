@@ -314,7 +314,7 @@ export const deductFromWallet = async (
   astrologerId?: string,
   sessionId?: string,
   duration?: number
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{ success: boolean; error?: string; transactionId?: string; remainingBalance?: number }> => {
   try {
     // Get current balance
     const { data: user, error: userError } = await supabaseAdmin
@@ -347,7 +347,7 @@ export const deductFromWallet = async (
     }
 
     // Create transaction record
-    await supabaseAdmin
+    const { data: transaction } = await supabaseAdmin
       .from('transactions')
       .insert({
         user_id: userId,
@@ -361,9 +361,15 @@ export const deductFromWallet = async (
         balance_before: balanceBefore,
         balance_after: newBalance,
         created_at: new Date().toISOString(),
-      });
+      })
+      .select()
+      .single();
 
-    return { success: true };
+    return {
+      success: true,
+      transactionId: transaction?.id,
+      remainingBalance: newBalance
+    };
   } catch (error) {
     console.error('Error in deductFromWallet:', error);
     return { success: false, error: 'Internal error' };

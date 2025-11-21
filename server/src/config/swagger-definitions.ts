@@ -6,24 +6,20 @@
 /**
  * @swagger
  * tags:
+ *   - name: Home Screen
+ *     description: Home screen APIs - Categories, Banners, Feedback, Live Astrologers, and Top-Rated Astrologers
  *   - name: Authentication
  *     description: OTP-based authentication endpoints
  *   - name: Users
  *     description: User profile management
  *   - name: Astrologers
- *     description: Astrologer discovery and details
- *   - name: Categories
- *     description: Service categories
+ *     description: Astrologer details and management
  *   - name: Search
  *     description: Advanced search functionality
- *   - name: Feedback
- *     description: User feedback system
  *   - name: Wallet
  *     description: Wallet and transactions
- *   - name: Banners
- *     description: Promotional banners
- *   - name: Chat
- *     description: Chat and communication
+ *   - name: Browse Chat Screen
+ *     description: Chat sessions and messaging
  *   - name: Notifications
  *     description: User notifications
  *   - name: Reviews
@@ -37,7 +33,7 @@
  * /api/v1/categories:
  *   get:
  *     summary: Get all categories
- *     tags: [Categories]
+ *     tags: [Home Screen]
  *     responses:
  *       200:
  *         description: List of categories
@@ -166,7 +162,7 @@
  * /api/v1/feedback:
  *   post:
  *     summary: Submit feedback
- *     tags: [Feedback]
+ *     tags: [Home Screen]
  *     requestBody:
  *       required: true
  *       content:
@@ -385,7 +381,7 @@
  * /api/v1/banners:
  *   get:
  *     summary: Get active banners
- *     tags: [Banners]
+ *     tags: [Home Screen]
  *     responses:
  *       200:
  *         description: List of active banners
@@ -471,7 +467,7 @@
  * /api/v1/chat/sessions:
  *   post:
  *     summary: Start chat session
- *     tags: [Chat]
+ *     tags: [Browse Chat Screen]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -499,7 +495,7 @@
  * /api/v1/chat/sessions/{sessionId}/end:
  *   patch:
  *     summary: End chat session
- *     tags: [Chat]
+ *     tags: [Browse Chat Screen]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -518,7 +514,7 @@
  * /api/v1/chat/sessions/{sessionId}/messages:
  *   get:
  *     summary: Get chat messages
- *     tags: [Chat]
+ *     tags: [Browse Chat Screen]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -536,7 +532,7 @@
  *         description: Chat messages
  *   post:
  *     summary: Send chat message
- *     tags: [Chat]
+ *     tags: [Browse Chat Screen]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -570,7 +566,7 @@
  * /api/v1/chat/sessions/{sessionId}/rating:
  *   post:
  *     summary: Rate chat session
- *     tags: [Chat]
+ *     tags: [Browse Chat Screen]
  *     security:
  *       - bearerAuth: []
  *     parameters:

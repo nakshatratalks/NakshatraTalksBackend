@@ -19,7 +19,7 @@ const router = Router();
  * /api/v1/astrologers/live:
  *   get:
  *     summary: Get live astrologers
- *     tags: [Astrologers]
+ *     tags: [Home Screen]
  *     parameters:
  *       - in: query
  *         name: limit
@@ -37,7 +37,7 @@ router.get('/live', getLiveAstrologers);
  * /api/v1/astrologers/top-rated:
  *   get:
  *     summary: Get top-rated astrologers
- *     tags: [Astrologers]
+ *     tags: [Home Screen]
  *     parameters:
  *       - in: query
  *         name: limit

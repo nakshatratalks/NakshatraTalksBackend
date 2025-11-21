@@ -213,7 +213,7 @@ export const createAstrologer = async (
       return;
     }
 
-    // Create astrologer
+    // Create astrologer (use new pricing fields)
     const { data: newAstrologer, error } = await supabaseAdmin
       .from('astrologers')
       .insert({
@@ -226,7 +226,9 @@ export const createAstrologer = async (
         languages,
         experience: Number(experience),
         education: education || [],
-        price_per_minute: Number(pricePerMinute),
+        chat_price_per_minute: Number(pricePerMinute),
+        call_price_per_minute: Number(pricePerMinute),
+        price_per_minute: Number(pricePerMinute), // Keep for backward compatibility
         working_hours: workingHours || {},
         rating: 0,
         total_calls: 0,
@@ -485,6 +487,70 @@ export const updateLiveStatus = async (
 };
 
 /**
+ * Get all unique specializations from astrologers
+ * GET /api/v1/specializations
+ */
+export const getSpecializations = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const isActiveParam = req.query.isActive;
+
+    // Build query to fetch all astrologers' specializations
+    let query = supabaseAdmin
+      .from('astrologers')
+      .select('specialization')
+      .eq('status', 'approved');
+
+    // Filter by active status if provided
+    if (isActiveParam !== undefined) {
+      const isActive = isActiveParam === 'true';
+      query = query.eq('is_available', isActive);
+    }
+
+    const { data: astrologers, error } = await query;
+
+    if (error) {
+      console.error('Error fetching specializations:', error);
+      sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to fetch specializations', 500, error);
+      return;
+    }
+
+    // Extract and flatten all specializations
+    const specializationsSet = new Set<string>();
+    astrologers?.forEach((astrologer: any) => {
+      if (Array.isArray(astrologer.specialization)) {
+        astrologer.specialization.forEach((spec: string) => {
+          if (spec && spec.trim()) {
+            specializationsSet.add(spec.trim());
+          }
+        });
+      }
+    });
+
+    // Convert to array and format as objects with metadata
+    const specializations = Array.from(specializationsSet)
+      .sort()
+      .map((name, index) => ({
+        id: `spec-${index + 1}`,
+        name,
+        icon: null,
+        description: null,
+        order: index + 1,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }));
+
+    sendSuccess(res, specializations, 'Specializations fetched successfully');
+  } catch (error) {
+    console.error('Error in getSpecializations:', error);
+    sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to fetch specializations', 500, error);
+  }
+};
+
+/**
  * Helper function to format astrologer response
  */
 const formatAstrologerResponse = (astrologer: any, includeDetails = false) => {
@@ -505,7 +571,10 @@ const formatAstrologerResponse = (astrologer: any, includeDetails = false) => {
       ...base,
       email: astrologer.email,
       phone: astrologer.phone,
-      pricePerMinute: astrologer.price_per_minute,
+      // Use new pricing fields, fallback to old field for backward compatibility
+      chatPricePerMinute: astrologer.chat_price_per_minute || astrologer.price_per_minute,
+      callPricePerMinute: astrologer.call_price_per_minute || astrologer.price_per_minute,
+      pricePerMinute: astrologer.price_per_minute, // Keep for backward compatibility
       isAvailable: astrologer.is_available,
       nextAvailableAt: astrologer.next_available_at || null,
       status: astrologer.status,
