@@ -38,12 +38,16 @@ export interface Astrologer {
   languages: string[];
   experience: number;
   education: string[];
-  pricePerMinute: number;
+  chatPricePerMinute: number; // Price per minute for chat consultations
+  callPricePerMinute: number; // Price per minute for voice call consultations
   rating: number;
   totalCalls: number;
   totalReviews: number;
-  isAvailable: boolean;
-  isLive: boolean;
+  isAvailable: boolean; // Deprecated - use chatAvailable/callAvailable
+  isLive: boolean; // For live sessions (one-to-many)
+  chatAvailable: boolean; // Real-time availability for chat
+  callAvailable: boolean; // Real-time availability for calls
+  lastActivityAt: string | null; // Timestamp for heartbeat tracking
   workingHours: Record<string, string>;
   status: 'pending' | 'approved' | 'rejected' | 'inactive';
   role: string;

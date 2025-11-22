@@ -8,10 +8,60 @@ import {
   getActiveSession,
   validateBalance,
   getChatHistory,
+  getAvailableAstrologersForChat,
 } from '../controllers/chat.controller';
 import { authenticateUser } from '../middleware/auth.middleware';
 
 const router = Router();
+
+/**
+ * @swagger
+ * /api/v1/chat/astrologers/available:
+ *   get:
+ *     summary: Get available astrologers for chat
+ *     tags: [Browse Chat Screen]
+ *     parameters:
+ *       - in: query
+ *         name: specialization
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: language
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: minRating
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: maxPrice
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [rating, chat_price_per_minute, experience, total_calls]
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *     responses:
+ *       200:
+ *         description: Available chat astrologers
+ */
+router.get('/astrologers/available', getAvailableAstrologersForChat);
 
 /**
  * @swagger

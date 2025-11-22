@@ -1,7 +1,9 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cron from 'node-cron';
 import { setupSwagger } from './config/swagger';
+import { supabaseAdmin } from './config/supabase';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
@@ -164,6 +166,34 @@ app.use((req: Request, res: Response) => {
     message: `Cannot ${req.method} ${req.path}`,
   });
 });
+
+// Auto-offline detection cron job
+// Runs every minute to check for inactive astrologers (no heartbeat > 2 minutes)
+cron.schedule('* * * * *', async () => {
+  try {
+    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+
+    const { data, error } = await supabaseAdmin
+      .from('astrologers')
+      .update({
+        chat_available: false,
+        call_available: false,
+      })
+      .lt('last_activity_at', twoMinutesAgo.toISOString())
+      .or('chat_available.eq.true,call_available.eq.true')
+      .select('id');
+
+    if (error) {
+      console.error('[Cron] Error setting inactive astrologers offline:', error);
+    } else if (data && data.length > 0) {
+      console.log(`[Cron] Set ${data.length} astrologer(s) offline due to inactivity`);
+    }
+  } catch (error) {
+    console.error('[Cron] Auto-offline detection error:', error);
+  }
+});
+
+console.log('⏰ Auto-offline detection cron job started (runs every minute)');
 
 // Start server only when not running in a serverless environment (e.g., Vercel)
 if (!process.env.VERCEL) {

@@ -8,6 +8,10 @@ import {
   deleteAstrologer,
   getAllAstrologers,
   updateLiveStatus,
+  toggleChatAvailability,
+  toggleCallAvailability,
+  updateHeartbeat,
+  getAvailabilityStatus,
 } from '../controllers/astrologers.controller';
 import { authenticateUser } from '../middleware/auth.middleware';
 import { requireAdmin, requireAdminOrAstrologer } from '../middleware/rbac.middleware';
@@ -102,6 +106,104 @@ router.get('/:id', getAstrologerDetails);
  *         description: Live status updated
  */
 router.patch('/:id/live-status', authenticateUser, requireAdminOrAstrologer, updateLiveStatus);
+
+/**
+ * @swagger
+ * /api/v1/astrologers/{id}/toggle-chat-availability:
+ *   patch:
+ *     summary: Toggle chat availability status
+ *     tags: [Astrologers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               chatAvailable:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Chat availability updated
+ */
+router.patch('/:id/toggle-chat-availability', authenticateUser, requireAdminOrAstrologer, toggleChatAvailability);
+
+/**
+ * @swagger
+ * /api/v1/astrologers/{id}/toggle-call-availability:
+ *   patch:
+ *     summary: Toggle call availability status
+ *     tags: [Astrologers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               callAvailable:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: Call availability updated
+ */
+router.patch('/:id/toggle-call-availability', authenticateUser, requireAdminOrAstrologer, toggleCallAvailability);
+
+/**
+ * @swagger
+ * /api/v1/astrologers/{id}/heartbeat:
+ *   post:
+ *     summary: Update astrologer heartbeat timestamp
+ *     tags: [Astrologers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Heartbeat updated
+ */
+router.post('/:id/heartbeat', authenticateUser, updateHeartbeat);
+
+/**
+ * @swagger
+ * /api/v1/astrologers/{id}/availability-status:
+ *   get:
+ *     summary: Get astrologer availability status
+ *     tags: [Astrologers]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Availability status
+ */
+router.get('/:id/availability-status', authenticateUser, requireAdminOrAstrologer, getAvailabilityStatus);
 
 /**
  * @swagger

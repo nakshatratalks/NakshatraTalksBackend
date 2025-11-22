@@ -27,12 +27,12 @@ export const getAvailableAstrologersForCall = async (
     const limit = parseInt(limitParam as string, 10);
     const offset = parseInt(offsetParam as string, 10);
 
-    // Build query
+    // Build query - filter by call_available for real-time availability
     let query = supabaseAdmin
       .from('astrologers')
       .select('*', { count: 'exact' })
       .eq('status', 'approved')
-      .eq('is_available', true)
+      .eq('call_available', true)
       .not('call_price_per_minute', 'is', null);
 
     // Apply filters
@@ -84,13 +84,17 @@ export const getAvailableAstrologersForCall = async (
       id: a.id,
       name: a.name,
       image: a.image,
+      bio: a.bio,
       isLive: a.is_live,
-      isAvailable: a.is_available,
+      isAvailable: a.is_available, // Deprecated - kept for backward compatibility
+      callAvailable: a.call_available,
+      lastActivityAt: a.last_activity_at,
       specialization: a.specialization || [],
       languages: a.languages || [],
       experience: a.experience,
       rating: a.rating || 0,
       totalCalls: a.total_calls || 0,
+      totalReviews: a.total_reviews || 0,
       callPricePerMinute: a.call_price_per_minute,
       nextAvailableAt: a.next_available_at || null,
     })) || [];

@@ -113,6 +113,20 @@ export const startChatSession = async (
       return;
     }
 
+    // Set astrologer as unavailable for the session type
+    if (sessionType === 'chat') {
+      await supabaseAdmin
+        .from('astrologers')
+        .update({ chat_available: false })
+        .eq('id', astrologerId);
+    } else {
+      // For call or video sessions
+      await supabaseAdmin
+        .from('astrologers')
+        .update({ call_available: false })
+        .eq('id', astrologerId);
+    }
+
     sendSuccess(
       res,
       {
@@ -189,6 +203,26 @@ const endExistingSession = async (sessionId: string, userId: string): Promise<vo
 
     // Update astrologer total calls
     await supabaseAdmin.rpc('increment_astrologer_calls', { astrologer_id: session.astrologer_id });
+
+    // Restore astrologer availability for the session type
+    if (session.session_type === 'chat') {
+      await supabaseAdmin
+        .from('astrologers')
+        .update({
+          chat_available: true,
+          last_activity_at: new Date().toISOString()
+        })
+        .eq('id', session.astrologer_id);
+    } else {
+      // For call or video sessions
+      await supabaseAdmin
+        .from('astrologers')
+        .update({
+          call_available: true,
+          last_activity_at: new Date().toISOString()
+        })
+        .eq('id', session.astrologer_id);
+    }
   } catch (error) {
     console.error('Error ending existing session:', error);
   }
@@ -284,6 +318,26 @@ export const endChatSession = async (
 
     // Update astrologer total calls
     await supabaseAdmin.rpc('increment_astrologer_calls', { astrologer_id: session.astrologer_id });
+
+    // Restore astrologer availability for the session type
+    if (session.session_type === 'chat') {
+      await supabaseAdmin
+        .from('astrologers')
+        .update({
+          chat_available: true,
+          last_activity_at: new Date().toISOString()
+        })
+        .eq('id', session.astrologer_id);
+    } else {
+      // For call or video sessions
+      await supabaseAdmin
+        .from('astrologers')
+        .update({
+          call_available: true,
+          last_activity_at: new Date().toISOString()
+        })
+        .eq('id', session.astrologer_id);
+    }
 
     // Format duration message
     const durationText = durationSeconds < 60
@@ -719,5 +773,112 @@ export const getChatHistory = async (
   } catch (error) {
     console.error('Error in getChatHistory:', error);
     sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to fetch chat history', 500, error);
+  }
+};
+
+/**
+ * Get available astrologers for chat
+ * GET /api/v1/chat/astrologers/available
+ */
+export const getAvailableAstrologersForChat = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const {
+      specialization,
+      language,
+      minRating,
+      maxPrice,
+      sortBy = 'rating',
+      order = 'desc',
+      limit: limitParam = '20',
+      offset: offsetParam = '0',
+    } = req.query;
+
+    const limit = parseInt(limitParam as string, 10);
+    const offset = parseInt(offsetParam as string, 10);
+
+    // Build query for available chat astrologers
+    let query = supabaseAdmin
+      .from('astrologers')
+      .select('*', { count: 'exact' })
+      .eq('chat_available', true)
+      .eq('status', 'approved');
+
+    // Apply filters
+    if (specialization) {
+      query = query.contains('specialization', [String(specialization)]);
+    }
+
+    if (language) {
+      query = query.contains('languages', [String(language)]);
+    }
+
+    if (minRating) {
+      query = query.gte('rating', parseFloat(String(minRating)));
+    }
+
+    if (maxPrice) {
+      query = query.lte('chat_price_per_minute', parseFloat(String(maxPrice)));
+    }
+
+    // Apply sorting
+    const validSortFields = ['rating', 'chat_price_per_minute', 'experience', 'total_calls'];
+    const sortField = validSortFields.includes(String(sortBy)) ? String(sortBy) : 'rating';
+    const sortOrder = order === 'asc';
+
+    query = query.order(sortField, { ascending: sortOrder });
+
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+
+    const { data: astrologers, error, count } = await query;
+
+    if (error) {
+      console.error('Error fetching available chat astrologers:', error);
+      sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to fetch available astrologers', 500, error);
+      return;
+    }
+
+    // Format response
+    const formattedAstrologers = astrologers?.map(a => ({
+      id: a.id,
+      name: a.name,
+      image: a.image,
+      bio: a.bio,
+      specialization: a.specialization || [],
+      languages: a.languages || [],
+      experience: a.experience,
+      rating: a.rating || 0,
+      totalCalls: a.total_calls || 0,
+      totalReviews: a.total_reviews || 0,
+      pricePerMinute: a.chat_price_per_minute,
+      isLive: a.is_live,
+      chatAvailable: a.chat_available,
+      lastActivityAt: a.last_activity_at,
+    })) || [];
+
+    const totalPages = Math.ceil((count || 0) / limit);
+    const currentPage = Math.floor(offset / limit) + 1;
+
+    const pagination = {
+      currentPage,
+      totalPages,
+      totalItems: count || 0,
+      itemsPerPage: limit,
+      hasNext: currentPage < totalPages,
+      hasPrev: currentPage > 1,
+    };
+
+    res.status(200).json({
+      success: true,
+      data: formattedAstrologers,
+      pagination,
+      message: 'Available chat astrologers fetched successfully',
+    });
+  } catch (error) {
+    console.error('Error in getAvailableAstrologersForChat:', error);
+    sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to fetch available astrologers', 500, error);
   }
 };

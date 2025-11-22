@@ -76,17 +76,13 @@ The platform will support two distinct user roles:
 4. **Call with Astrologer (Voice):**  
    * Users can initiate a private, one-on-one voice call with an available astrologer.  
    * This feature will also be billed per-minute from the user's wallet.  
-   * The call interface will include standard controls (mute, speakerphone, end call) and display the session duration and cost.  
-5. **Video Call with Astrologer:**  
-   * Users can engage in a face-to-face video consultation with an astrologer.  
-   * This premium feature will be billed per-minute from the user's wallet.  
-   * The interface will include video controls (toggle camera, switch camera) in addition to standard call controls.  
-6. **Live Sessions with Astrologers:**  
+   * The call interface will include standard controls (mute, speakerphone, end call) and display the session duration and cost.   
+5. **Live Sessions with Astrologers:**  
    * Astrologers can host live, one-to-many video sessions on specific topics (e.g., "Weekly Career Forecast").  
    * Users can join these sessions to watch, listen, and interact via a public chat.  
    * This feature is designed for broader user engagement and to showcase the expertise of the astrologers on the platform.
 
-  7**.   Introductory Chatbot**
+  6**.   Introductory Chatbot**
 
 * The chatbot will initiate a guided conversation immediately after the **Initial Profile Setup (Screen 4\)** is completed.  
   * It will leverage the user's previously entered **birth details** (date, time, place) to provide a few basic, auto-generated "starter insights."  

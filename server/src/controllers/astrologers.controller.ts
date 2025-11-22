@@ -551,6 +551,209 @@ export const getSpecializations = async (
 };
 
 /**
+ * Toggle chat availability status
+ * PATCH /api/v1/astrologers/:id/toggle-chat-availability
+ */
+export const toggleChatAvailability = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { chatAvailable } = req.body;
+
+    if (typeof chatAvailable !== 'boolean') {
+      sendError(res, ErrorCodes.VALIDATION_ERROR, 'chatAvailable must be a boolean value', 400);
+      return;
+    }
+
+    // Verify astrologer owns this profile (or is admin)
+    if (req.user?.id !== id && req.user?.role !== 'admin') {
+      sendError(res, ErrorCodes.FORBIDDEN, 'You can only update your own availability status', 403);
+      return;
+    }
+
+    const { data: updatedAstrologer, error } = await supabaseAdmin
+      .from('astrologers')
+      .update({
+        chat_available: chatAvailable,
+        last_activity_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        sendError(res, ErrorCodes.NOT_FOUND, 'Astrologer not found', 404);
+        return;
+      }
+      console.error('Error updating chat availability:', error);
+      sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to update chat availability', 500, error);
+      return;
+    }
+
+    sendSuccess(
+      res,
+      {
+        chatAvailable: updatedAstrologer.chat_available,
+        lastActivityAt: updatedAstrologer.last_activity_at
+      },
+      `Chat availability ${chatAvailable ? 'enabled' : 'disabled'} successfully`
+    );
+  } catch (error) {
+    console.error('Error in toggleChatAvailability:', error);
+    sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to update chat availability', 500, error);
+  }
+};
+
+/**
+ * Toggle call availability status
+ * PATCH /api/v1/astrologers/:id/toggle-call-availability
+ */
+export const toggleCallAvailability = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { callAvailable } = req.body;
+
+    if (typeof callAvailable !== 'boolean') {
+      sendError(res, ErrorCodes.VALIDATION_ERROR, 'callAvailable must be a boolean value', 400);
+      return;
+    }
+
+    // Verify astrologer owns this profile (or is admin)
+    if (req.user?.id !== id && req.user?.role !== 'admin') {
+      sendError(res, ErrorCodes.FORBIDDEN, 'You can only update your own availability status', 403);
+      return;
+    }
+
+    const { data: updatedAstrologer, error } = await supabaseAdmin
+      .from('astrologers')
+      .update({
+        call_available: callAvailable,
+        last_activity_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        sendError(res, ErrorCodes.NOT_FOUND, 'Astrologer not found', 404);
+        return;
+      }
+      console.error('Error updating call availability:', error);
+      sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to update call availability', 500, error);
+      return;
+    }
+
+    sendSuccess(
+      res,
+      {
+        callAvailable: updatedAstrologer.call_available,
+        lastActivityAt: updatedAstrologer.last_activity_at
+      },
+      `Call availability ${callAvailable ? 'enabled' : 'disabled'} successfully`
+    );
+  } catch (error) {
+    console.error('Error in toggleCallAvailability:', error);
+    sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to update call availability', 500, error);
+  }
+};
+
+/**
+ * Update heartbeat timestamp
+ * POST /api/v1/astrologers/:id/heartbeat
+ */
+export const updateHeartbeat = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Verify astrologer owns this profile
+    if (req.user?.id !== id) {
+      sendError(res, ErrorCodes.FORBIDDEN, 'You can only update your own heartbeat', 403);
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    const { error } = await supabaseAdmin
+      .from('astrologers')
+      .update({
+        last_activity_at: now,
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating heartbeat:', error);
+      sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to update heartbeat', 500, error);
+      return;
+    }
+
+    sendSuccess(
+      res,
+      {
+        success: true,
+        lastActivityAt: now
+      }
+    );
+  } catch (error) {
+    console.error('Error in updateHeartbeat:', error);
+    sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to update heartbeat', 500, error);
+  }
+};
+
+/**
+ * Get astrologer availability status
+ * GET /api/v1/astrologers/:id/availability-status
+ */
+export const getAvailabilityStatus = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    // Verify astrologer owns this profile (or is admin)
+    if (req.user?.id !== id && req.user?.role !== 'admin') {
+      sendError(res, ErrorCodes.FORBIDDEN, 'You can only view your own availability status', 403);
+      return;
+    }
+
+    const { data: astrologer, error } = await supabaseAdmin
+      .from('astrologers')
+      .select('id, chat_available, call_available, last_activity_at, chat_price_per_minute, call_price_per_minute')
+      .eq('id', id)
+      .single();
+
+    if (error || !astrologer) {
+      sendError(res, ErrorCodes.NOT_FOUND, 'Astrologer not found', 404);
+      return;
+    }
+
+    sendSuccess(res, {
+      id: astrologer.id,
+      chatAvailable: astrologer.chat_available,
+      callAvailable: astrologer.call_available,
+      lastActivityAt: astrologer.last_activity_at,
+      chatPricePerMinute: astrologer.chat_price_per_minute,
+      callPricePerMinute: astrologer.call_price_per_minute,
+    });
+  } catch (error) {
+    console.error('Error in getAvailabilityStatus:', error);
+    sendError(res, ErrorCodes.SERVER_ERROR, 'Failed to fetch availability status', 500, error);
+  }
+};
+
+/**
  * Helper function to format astrologer response
  */
 const formatAstrologerResponse = (astrologer: any, includeDetails = false) => {
@@ -576,6 +779,9 @@ const formatAstrologerResponse = (astrologer: any, includeDetails = false) => {
       callPricePerMinute: astrologer.call_price_per_minute || astrologer.price_per_minute,
       pricePerMinute: astrologer.price_per_minute, // Keep for backward compatibility
       isAvailable: astrologer.is_available,
+      chatAvailable: astrologer.chat_available,
+      callAvailable: astrologer.call_available,
+      lastActivityAt: astrologer.last_activity_at,
       nextAvailableAt: astrologer.next_available_at || null,
       status: astrologer.status,
     };
