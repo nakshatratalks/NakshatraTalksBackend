@@ -81,8 +81,8 @@ pm2 save
 
 echo "=================================================="
 echo "✅ Deployment completed successfully\!"
-echo "🌐 API is running at: http://147.79.66.3:4000"
-echo "📚 Swagger docs: http://147.79.66.3:4000/api-docs"
+echo "🌐 API is running at: http://api.nakshatratalks.com"
+echo "📚 Swagger docs: http://api.nakshatratalks.com/api-docs"
 echo "=================================================="
 
 # Show recent logs
