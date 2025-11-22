@@ -15,6 +15,7 @@ import feedbackRoutes from './routes/feedback.routes';
 import walletRoutes from './routes/wallet.routes';
 import bannersRoutes from './routes/banners.routes';
 import chatRoutes from './routes/chat.routes';
+import callRoutes from './routes/call.routes';
 import notificationsRoutes from './routes/notifications.routes';
 import reviewsRoutes from './routes/reviews.routes';
 import analyticsRoutes from './routes/analytics.routes';
@@ -47,6 +48,7 @@ app.use(`${API_VERSION}/feedback`, feedbackRoutes);
 app.use(`${API_VERSION}/wallet`, walletRoutes);
 app.use(`${API_VERSION}/banners`, bannersRoutes);
 app.use(`${API_VERSION}/chat`, chatRoutes);
+app.use(`${API_VERSION}/call`, callRoutes);
 app.use(`${API_VERSION}/notifications`, notificationsRoutes);
 app.use(`${API_VERSION}`, reviewsRoutes); // Reviews routes have /astrologers/:id/reviews
 
@@ -130,6 +132,13 @@ app.get('/', (_req: Request, res: Response) => {
         start: '/api/v1/chat/sessions',
         end: '/api/v1/chat/sessions/:sessionId/end',
         messages: '/api/v1/chat/sessions/:sessionId/messages',
+      },
+      call: {
+        astrologers: '/api/v1/call/astrologers',
+        specializations: '/api/v1/call/specializations',
+        start: '/api/v1/call/sessions',
+        end: '/api/v1/call/sessions/:sessionId/end',
+        active: '/api/v1/call/sessions/active',
       },
       notifications: '/api/v1/notifications',
       reviews: '/api/v1/astrologers/:id/reviews',
